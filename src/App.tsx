@@ -3,10 +3,11 @@ import LandingPage from "./pages/LandingPage";
 import { FeaturesPage } from "../src/components/features/features-page/FeaturesPage"; // Updated import
 import DebugFeaturesAPI from "./pages/DebugFeaturesApi";
 import DebugLandingAPI from "./pages/DebugLandingApi";
+import ApiDebugger from "./components/ApiDebugger";
 
 function App() {
   const [currentView, setCurrentView] = useState<{
-    type: "landing" | "features" | "debug-features" | "debug-landing";
+    type: "landing" | "features" | "debug-features" | "debug-landing" | "api-debug";
     slug?: string;
   }>({ type: "landing" });
 
@@ -17,6 +18,11 @@ function App() {
       const hash = window.location.hash;
 
       // Debug pages
+      if (path.includes("/api-debug") || hash.includes("#api-debug")) {
+        setCurrentView({ type: "api-debug" });
+        return;
+      }
+      
       if (path.includes("/debug-features") || hash.includes("#debug-features")) {
         setCurrentView({ type: "debug-features" });
         return;
@@ -73,6 +79,10 @@ function App() {
 
   if (currentView.type === "debug-landing") {
     return <DebugLandingAPI />;
+  }
+
+  if (currentView.type === "api-debug") {
+    return <ApiDebugger />;
   }
 
   return <LandingPage />;
