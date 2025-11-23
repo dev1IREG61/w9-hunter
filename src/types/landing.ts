@@ -361,21 +361,66 @@ export const fetchLandingPageData = async (): Promise<LandingPageData> => {
     });
 
     if (!response.ok) {
-      throw new Error(
-        `Failed to fetch landing page data: ${response.status} ${response.statusText}`
-      );
+      console.warn("API error, using fallback data");
+      return {
+        id: 1,
+        title: "W9-Hunter",
+        meta: {
+          type: "landing.LandingPage",
+          detail_url: "",
+          html_url: null,
+          slug: "home",
+          show_in_menus: true,
+          seo_title: "W9-Hunter",
+          search_description: "",
+          first_published_at: null,
+          last_published_at: null,
+        },
+        header_section_image: null,
+      };
     }
 
     const data: ApiResponse = await response.json();
 
     if (!data || !data.items || data.items.length === 0) {
-      throw new Error("No landing page data available");
+      console.warn("No landing page data from API, using fallback");
+      return {
+        id: 1,
+        title: "W9-Hunter",
+        meta: {
+          type: "landing.LandingPage",
+          detail_url: "",
+          html_url: null,
+          slug: "home",
+          show_in_menus: true,
+          seo_title: "W9-Hunter",
+          search_description: "",
+          first_published_at: null,
+          last_published_at: null,
+        },
+        header_section_image: null,
+      };
     }
 
     return data.items[0];
   } catch (error) {
     console.error("Error fetching landing page data:", error);
-    throw error;
+    return {
+      id: 1,
+      title: "W9-Hunter",
+      meta: {
+        type: "landing.LandingPage",
+        detail_url: "",
+        html_url: null,
+        slug: "home",
+        show_in_menus: true,
+        seo_title: "W9-Hunter",
+        search_description: "",
+        first_published_at: null,
+        last_published_at: null,
+      },
+      header_section_image: null,
+    };
   }
 };
 
