@@ -61,7 +61,7 @@ const DebugFeaturesAPI = () => {
         const isDevelopment = import.meta.env.DEV;
         const frontendUrl = isDevelopment
           ? "http://localhost:5173"
-          : "https://w9chaser.com";
+          : "https://w9hunter.com";
 
         const baseApiUrl = isDevelopment
           ? "/blogs/api/v2"

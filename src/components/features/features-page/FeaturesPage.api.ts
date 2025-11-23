@@ -3,7 +3,7 @@ import type { FeaturesPageData } from "../../../types/features-page";
 const isDevelopment = import.meta.env.DEV;
 const frontendUrl = isDevelopment
   ? "http://localhost:5173"
-  : "http://w9chaser.com";
+  : "http://w9hunter.com";
 
 const baseApiUrl = isDevelopment
   ? "/blogs/api/v2"
