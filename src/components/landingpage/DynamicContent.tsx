@@ -54,10 +54,10 @@ const ScrollAnimateItem: React.FC<any> = ({ item }) => {
   return (
     <div
       ref={itemRef}
-      className="opacity-0 group bg-white rounded-2xl p-6 hover:shadow-xl transition-all duration-300 border-2 border-blue-200 hover:border-blue-400 hover:-translate-y-2"
+      className="opacity-0 group bg-theme-background rounded-2xl p-4 sm:p-6 hover:shadow-xl transition-all duration-300 border-2 border-theme-primary/20 hover:border-theme-primary/40 hover:-translate-y-2"
     >
       {item.image && item.image.url && (
-        <div className="w-full h-48 rounded-xl mb-4 overflow-hidden">
+        <div className="w-full h-32 sm:h-48 rounded-xl mb-4 overflow-hidden">
           <img
             src={getFullImageUrl(item.image.url)}
             alt={item.image.title || item.title || "Content image"}
@@ -66,19 +66,21 @@ const ScrollAnimateItem: React.FC<any> = ({ item }) => {
         </div>
       )}
 
-      <h4 className="text-xl font-bold mb-2 text-gray-800 group-hover:text-blue-600 transition-colors">
+      <h4 className="text-lg sm:text-xl font-bold mb-2 text-theme-text group-hover:text-theme-primary transition-colors">
         {item.title || "Untitled"}
       </h4>
 
       {subtitle && (
-        <p className="text-sm mb-3 text-gray-600 font-medium">{subtitle}</p>
+        <p className="text-xs sm:text-sm mb-3 text-theme-neutral font-medium">
+          {subtitle}
+        </p>
       )}
 
       {listItems.length > 0 && (
-        <ul className="grid grid-cols-3 gap-x-3 gap-y-1.5 text-gray-600">
+        <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-3 gap-y-1.5 text-theme-neutral">
           {listItems.map((text: string, i: number) => (
-            <li key={i} className="text-xs flex items-center">
-              <span className="mr-1.5 text-blue-600">•</span>
+            <li key={i} className="text-xs sm:text-sm flex items-center">
+              <span className="mr-1.5 text-theme-primary">•</span>
               {text}
             </li>
           ))}
@@ -126,7 +128,20 @@ const ScrollAnimateCard: React.FC<any> = ({
   return (
     <div
       ref={cardRef}
-      className={`opacity-0 group bg-gradient-to-br ${bgClass} rounded-2xl p-4 md:p-6 hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border`}
+      className={`opacity-0 group ${
+        cardData.card_background ? "" : `bg-gradient-to-br ${bgClass}`
+      } rounded-2xl p-4 md:p-6 hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border`}
+      style={
+        cardData.card_background
+          ? {
+              backgroundImage: `url(${getFullImageUrl(
+                cardData.card_background.url
+              )})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }
+          : {}
+      }
     >
       {icon && (
         <div className="w-14 h-14 rounded-xl flex items-center justify-center mb-6 transition-all duration-300 group-hover:scale-110 bg-blue-100">
@@ -217,11 +232,66 @@ const DynamicContentRenderer: React.FC<{ block: DynamicContentBlock }> = ({
 }) => {
   switch (block.type) {
     case "rich_text":
+      const richRef = useRef<HTMLDivElement>(null);
+      useEffect(() => {
+        const el = richRef.current;
+        if (!el) return;
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                el.classList.add("animate-fadeInUp");
+                el.classList.remove("opacity-0");
+              }
+            });
+          },
+          { threshold: 0.1 }
+        );
+        observer.observe(el);
+        return () => observer.disconnect();
+      }, []);
       return (
-        <div
-          className="prose prose-lg max-w-none mb-8 text-gray-700"
-          dangerouslySetInnerHTML={{ __html: block.value }}
-        />
+        <div className="relative px-4 sm:pl-16 max-w-2xl mx-auto mb-8">
+          <style>{`
+            @keyframes colorBlink {
+              0%, 14% { color: #ef4444; }
+              14%, 28% { color: #f97316; }
+              28%, 42% { color: #eab308; }
+              42%, 56% { color: #22c55e; }
+              56%, 70% { color: #3b82f6; }
+              70%, 84% { color: #8b5cf6; }
+              84%, 100% { color: #ec4899; }
+            }
+            .arrow-blink { animation: colorBlink 2.1s infinite; }
+          `}</style>
+          <div className="hidden sm:flex absolute left-10 top-10 -translate-x-full pl-6 font-bold arrow-blink items-center">
+            <span className="text-2xl">&gt;</span>
+            <span className="text-3xl">&gt;</span>
+            <span className="text-4xl">&gt;</span>
+            <span className="text-5xl">&gt;</span>
+            <span className="text-6xl">&gt;</span>
+          </div>
+
+          <div className="hidden sm:flex absolute -right-5 top-10 translate-x-full pr-6 font-bold arrow-blink items-center">
+            <span className="text-6xl">&lt;</span>
+            <span className="text-5xl">&lt;</span>
+            <span className="text-4xl">&lt;</span>
+            <span className="text-3xl">&lt;</span>
+            <span className="text-2xl">&lt;</span>
+          </div>
+
+          <div className="hidden absolute -left-20 -top-1/3 -translate-y-1/4 text-[10rem] font-bold arrow-blink">
+            →
+          </div>
+          <div
+            ref={richRef}
+            style={{
+              fontFamily: '"Inter", "Segoe UI", system-ui, sans-serif',
+            }}
+            className="opacity-0 prose prose-sm sm:prose-base md:prose-lg px-3 sm:px-4 py-6 sm:py-8 rounded-xl sm:rounded-2xl border-2 border-theme-primary/30 shadow-lg hover:shadow-xl hover:border-theme-primary/50 transition-all duration-300 text-center gradient-theme-primary [&>h1]:text-2xl sm:[&>h1]:text-3xl md:[&>h1]:text-4xl [&>h1]:font-bold [&>h1]:mb-4 sm:[&>h1]:mb-6 [&>h1]:text-white [&>h2]:text-xl sm:[&>h2]:text-2xl md:[&>h2]:text-3xl [&>h2]:font-bold [&>h2]:mb-3 sm:[&>h2]:mb-5 [&>h2]:text-white [&>h3]:text-lg sm:[&>h3]:text-xl md:[&>h3]:text-2xl [&>h3]:font-semibold [&>h3]:mb-3 sm:[&>h3]:mb-4 [&>h3]:text-white [&>h4]:text-base sm:[&>h4]:text-lg md:[&>h4]:text-xl [&>h4]:font-semibold [&>h4]:mb-2 sm:[&>h4]:mb-3 [&>h4]:text-white [&>p]:text-sm sm:[&>p]:text-base [&>p]:leading-relaxed [&>p]:mb-3 sm:[&>p]:mb-4 [&>p]:text-white [&>ul]:space-y-1.5 sm:[&>ul]:space-y-2 [&>ul]:mb-3 sm:[&>ul]:mb-4 [&>ul>li]:text-white [&>ol]:space-y-1.5 sm:[&>ol]:space-y-2 [&>ol]:mb-3 sm:[&>ol]:mb-4 [&>ol>li]:text-white [&>a]:text-white [&>a]:underline [&>a:hover]:text-white/80 [&>strong]:font-bold [&>strong]:text-white [&>em]:italic [&>em]:text-white [&>blockquote]:border-l-4 [&>blockquote]:border-white [&>blockquote]:pl-4 sm:[&>blockquote]:pl-6 [&>blockquote]:py-3 sm:[&>blockquote]:py-4 [&>blockquote]:bg-white/10 [&>blockquote]:rounded-r-lg [&>blockquote]:my-4 sm:[&>blockquote]:my-6 [&>blockquote]:text-white"
+            dangerouslySetInnerHTML={{ __html: block.value }}
+          />
+        </div>
       );
 
     case "blockquote":
@@ -312,7 +382,7 @@ const DynamicContentRenderer: React.FC<{ block: DynamicContentBlock }> = ({
       return (
         <div className="mb-16">
           {block.value.heading && (
-            <h3 className="text-3xl md:text-4xl font-bold mb-4 text-center text-gray-800">
+            <h3 className="text-3xl md:text-4xl font-bold mb-4 text-center text-theme-text">
               {block.value.heading}
             </h3>
           )}
@@ -330,32 +400,30 @@ const DynamicContentRenderer: React.FC<{ block: DynamicContentBlock }> = ({
                 : block.value.columns === "3"
                 ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
                 : block.value.columns === "4"
-                ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+                ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-4"
                 : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
             }`}
           >
             {block.value.cards?.map((card: any, idx: number) => {
-              // Get card content from snippet or use custom data
               const cardData = card.card_content || card;
-              const title = card.custom_title || cardData.title;
+              const title = card.custom_title || cardData.title || "";
               const description =
-                card.custom_description || cardData.description;
-              const icon = cardData.icon;
+                card.custom_description || cardData.description || "";
+              const icon = card.card_icon || cardData.icon || "";
+              const image = card.card_image || cardData.card_image;
+              const background =
+                card.card_background || cardData.card_background;
               const features = cardData.features || [];
 
-              // Smart bullet point detection
               const formatDescription = (desc: string) => {
                 if (!desc) return null;
                 const lines = desc.split(/\r?\n/).filter((line) => line.trim());
-
                 return lines.map((line, i) => {
                   const trimmed = line.trim();
-                  // Detect if line should be a bullet
                   const isBullet =
                     trimmed.length < 80 &&
                     !trimmed.endsWith(":") &&
                     (i > 0 || lines.length > 2);
-
                   if (isBullet) {
                     return (
                       <li key={i} className="flex items-start gap-2 mb-2">
@@ -380,14 +448,18 @@ const DynamicContentRenderer: React.FC<{ block: DynamicContentBlock }> = ({
                 "from-cyan-50 to-teal-50 border-cyan-200 hover:border-cyan-400",
                 "from-yellow-50 to-amber-50 border-yellow-200 hover:border-yellow-400",
               ];
-              const bgClass = bgColors[idx % bgColors.length];
+              const bgClass = background ? "" : bgColors[idx % bgColors.length];
 
               return (
                 <ScrollAnimateCard
                   key={idx}
                   bgClass={bgClass}
                   idx={idx}
-                  cardData={cardData}
+                  cardData={{
+                    ...cardData,
+                    card_image: image,
+                    card_background: background,
+                  }}
                   title={title}
                   description={description}
                   icon={icon}
@@ -406,7 +478,7 @@ const DynamicContentRenderer: React.FC<{ block: DynamicContentBlock }> = ({
       return (
         <div className="mb-16">
           {dynamicListData.heading && (
-            <h3 className="text-4xl font-bold mb-4 text-center text-gray-800">
+            <h3 className="text-4xl font-bold mb-4 text-center text-theme-text">
               {dynamicListData.heading}
             </h3>
           )}
@@ -415,7 +487,7 @@ const DynamicContentRenderer: React.FC<{ block: DynamicContentBlock }> = ({
               {dynamicListData.description}
             </p>
           )}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
             {Array.isArray(dynamicListData.items) &&
               dynamicListData.items.map((item: any, idx: number) => {
                 if (!item || typeof item !== "object") return null;
@@ -432,7 +504,7 @@ const DynamicContentRenderer: React.FC<{ block: DynamicContentBlock }> = ({
       return (
         <div className="mb-16">
           {dynamicListOldData.heading && (
-            <h3 className="text-4xl font-bold mb-4 text-center text-gray-800">
+            <h3 className="text-4xl font-bold mb-4 text-center text-theme-text">
               {dynamicListOldData.heading}
             </h3>
           )}
@@ -441,7 +513,7 @@ const DynamicContentRenderer: React.FC<{ block: DynamicContentBlock }> = ({
               {dynamicListOldData.description}
             </p>
           )}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
             {Array.isArray(dynamicListOldData.items) &&
               dynamicListOldData.items.map((item: any, idx: number) => {
                 if (!item || typeof item !== "object") return null;
@@ -452,7 +524,10 @@ const DynamicContentRenderer: React.FC<{ block: DynamicContentBlock }> = ({
                     className="relative h-80 rounded-3xl overflow-hidden group cursor-pointer"
                   >
                     {/* Blue hover effect from bottom right */}
-                    <div className="absolute inset-0 bg-blue-600 translate-x-full translate-y-full group-hover:translate-x-0 group-hover:translate-y-0 transition-transform duration-500 ease-out origin-bottom-right" style={{ clipPath: 'polygon(100% 0, 100% 100%, 0 100%)' }}></div>
+                    <div
+                      className="absolute inset-0 bg-blue-600 translate-x-full translate-y-full group-hover:translate-x-0 group-hover:translate-y-0 transition-transform duration-500 ease-out origin-bottom-right"
+                      style={{ clipPath: "polygon(100% 0, 100% 100%, 0 100%)" }}
+                    ></div>
                     {/* Background Image */}
                     {item.image && item.image.url && (
                       <div className="absolute inset-0">
@@ -468,7 +543,7 @@ const DynamicContentRenderer: React.FC<{ block: DynamicContentBlock }> = ({
 
                     {/* Text Content */}
                     <div className="relative h-full flex flex-col justify-end p-6 text-white">
-                      <h4 className="text-2xl font-bold mb-2 drop-shadow-lg">
+                      <h4 className="text-2xl font-bold mb-2 drop-shadow-lg text-white">
                         {item.title || "Untitled"}
                       </h4>
                       <p className="text-lg opacity-90 drop-shadow">
@@ -488,7 +563,7 @@ const DynamicContentRenderer: React.FC<{ block: DynamicContentBlock }> = ({
       return (
         <div className="mb-16">
           {oldDynamicListData.heading && (
-            <h3 className="text-4xl font-bold mb-4 text-gray-800">
+            <h3 className="text-4xl font-bold mb-4 text-theme-text">
               {oldDynamicListData.heading}
             </h3>
           )}
@@ -523,7 +598,7 @@ const DynamicContentRenderer: React.FC<{ block: DynamicContentBlock }> = ({
                           </div>
                         )}
 
-                        <h4 className="text-3xl font-bold mb-4 text-gray-800">
+                        <h4 className="text-3xl font-bold mb-4 text-theme-text">
                           {itemValue.title || "Untitled"}
                         </h4>
 
@@ -564,7 +639,7 @@ const DynamicContentRenderer: React.FC<{ block: DynamicContentBlock }> = ({
                           </div>
                         )}
 
-                        <h4 className="text-3xl font-bold mb-4 text-gray-800">
+                        <h4 className="text-3xl font-bold mb-4 text-theme-text">
                           {itemValue.title || "Feature"}
                         </h4>
 
@@ -589,7 +664,7 @@ const DynamicContentRenderer: React.FC<{ block: DynamicContentBlock }> = ({
                           </div>
                         )}
 
-                        <h4 className="text-3xl font-bold mb-4 text-gray-800">
+                        <h4 className="text-3xl font-bold mb-4 text-theme-text">
                           {itemValue.title || "Benefit"}
                         </h4>
 
