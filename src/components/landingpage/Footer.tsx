@@ -26,10 +26,6 @@ function Footer({ data }: FooterProps) {
     return null;
   }
 
-  const primaryColor = data.color_theme?.primary_color || "#3B82F6";
-  // const textColor = data.color_theme?.text_color || "#1F2937";
-  // const backgroundColor = data.color_theme?.background_color || "#1E293B";
-
   // Debug log to see what we're working with
   console.log("Footer config:", footerConfig);
 
@@ -68,25 +64,25 @@ function Footer({ data }: FooterProps) {
   const getFullImageUrl = (url: string) => {
     if (!url) return "";
     if (url.startsWith("http")) return url;
-    return `https://esign-admin.signmary.com${url}`; // <-- your backend domain
+    return `https://esign-admin.signmary.com${url}`;
   };
 
   return (
-    <footer className="relative overflow-hidden bg-gradient-to-br from-gray-50 via-white to-gray-50 border-t border-gray-200">
+    <footer className="relative overflow-hidden bg-gradient-to-br from-theme-background via-theme-background to-theme-neutral/5 border-t border-theme-neutral/20">
       {/* Subtle Pattern Background */}
       <div
         className="absolute inset-0 opacity-5"
         style={{
-          backgroundImage: `radial-gradient(circle at 20% 50%, ${primaryColor}20 0%, transparent 50%), radial-gradient(circle at 80% 80%, ${primaryColor}15 0%, transparent 50%)`,
+          backgroundImage: `radial-gradient(circle at 20% 50%, var(--color-primary)20 0%, transparent 50%), radial-gradient(circle at 80% 80%, var(--color-primary)15 0%, transparent 50%)`,
         }}
       />
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-14 md:py-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10 lg:gap-12 mb-8 sm:mb-10 lg:mb-12">
           {/* Company Info Section - ALWAYS SHOW */}
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6 text-left">
             {companyInfo.logo ? (
-              <div className="w-20 h-20 mx-auto md:mx-0">
+              <div className="w-16 h-16 sm:w-20 sm:h-20">
                 <img
                   src={getFullImageUrl(companyInfo.logo.url)}
                   alt={companyInfo.logo.title || "Company Logo"}
@@ -94,25 +90,20 @@ function Footer({ data }: FooterProps) {
                 />
               </div>
             ) : (
-              <div
-                className="h-20 w-20 rounded-2xl flex items-center justify-center text-white font-bold text-2xl mx-auto md:mx-0 shadow-lg"
-                style={{
-                  background: `linear-gradient(135deg, ${primaryColor}, ${primaryColor}dd)`,
-                }}
-              >
+              <div className="h-16 w-16 sm:h-20 sm:w-20 rounded-2xl flex items-center justify-center text-white font-bold text-xl sm:text-2xl shadow-lg gradient-theme-primary">
                 {data.title?.charAt(0) || "L"}
               </div>
             )}
 
             {companyInfo.description && (
-              <p className="text-xl leading-relaxed font-bold text-center md:text-left text-black-600">
+              <p className="text-base sm:text-lg md:text-xl leading-relaxed font-bold text-left text-theme-text">
                 {companyInfo.description}
               </p>
             )}
 
             {/* Social Links - ALWAYS SHOW IF LINKS EXIST */}
             {socialLinks.length > 0 && (
-              <div className="flex gap-3 justify-center md:justify-start">
+              <div className="flex gap-2 sm:gap-3 justify-start">
                 {socialLinks.map((social: any, idx: any) => {
                   const Icon = social.icon;
                   return (
@@ -122,19 +113,9 @@ function Footer({ data }: FooterProps) {
                       target="_blank"
                       rel="noopener noreferrer"
                       aria-label={social.label}
-                      className="w-10 h-10 rounded-xl bg-white border-2 border-gray-200 hover:border-transparent flex items-center justify-center transition-all duration-300 hover:scale-110 hover:shadow-lg text-gray-600"
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.background = `linear-gradient(135deg, ${primaryColor}, ${primaryColor}dd)`;
-                        e.currentTarget.style.color = "#FFFFFF";
-                        e.currentTarget.style.borderColor = "transparent";
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.background = "";
-                        e.currentTarget.style.color = "";
-                        e.currentTarget.style.borderColor = "";
-                      }}
+                      className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-theme-background border-2 border-theme-neutral/20 hover:border-transparent flex items-center justify-center transition-all duration-300 hover:scale-110 hover:shadow-lg text-theme-neutral hover:gradient-theme-primary hover:text-white"
                     >
-                      <Icon size={18} />
+                      <Icon size={16} className="sm:w-[18px] sm:h-[18px]" />
                     </a>
                   );
                 })}
@@ -145,29 +126,19 @@ function Footer({ data }: FooterProps) {
           {/* Quick Links Section */}
           {footerConfig.sections?.quick_links?.show &&
             quickLinks.length > 0 && (
-              <div>
-                <h3 className="text-gray-900 font-bold text-lg mb-6 relative inline-block">
+              <div className="text-left">
+                <h3 className="text-theme-text font-bold text-base sm:text-lg mb-4 sm:mb-6 relative inline-block">
                   {footerConfig.sections.quick_links.heading || "Quick Links"}
-                  <div
-                    className="absolute -bottom-2 left-0 w-12 h-1 rounded-full"
-                    style={{ background: primaryColor }}
-                  />
+                  <div className="absolute -bottom-2 left-0 w-12 h-1 rounded-full bg-theme-primary" />
                 </h3>
-                <ul className="space-y-3">
+                <ul className="space-y-2 sm:space-y-3">
                   {quickLinks.map((link: any, idx: number) => (
                     <li key={idx}>
                       <a
                         href={link.url || "#"}
-                        className="text-sm text-gray-600 hover:text-gray-900 transition-all duration-200 flex items-center gap-2 group"
-                        onMouseEnter={(e) =>
-                          (e.currentTarget.style.color = primaryColor)
-                        }
-                        onMouseLeave={(e) => (e.currentTarget.style.color = "")}
+                        className="text-xs sm:text-sm text-theme-neutral hover:text-theme-primary transition-all duration-200 flex items-center justify-start gap-2 group"
                       >
-                        <span
-                          className="w-0 h-0.5 group-hover:w-4 transition-all duration-200"
-                          style={{ background: primaryColor }}
-                        />
+                        <span className="w-0 h-0.5 group-hover:w-4 transition-all duration-200 bg-theme-primary" />
                         {link.name}
                       </a>
                     </li>
@@ -178,29 +149,19 @@ function Footer({ data }: FooterProps) {
 
           {/* Services Section */}
           {footerConfig.sections?.services?.show && serviceLinks.length > 0 && (
-            <div>
-              <h3 className="text-gray-900 font-bold text-lg mb-6 relative inline-block">
+            <div className="text-left">
+              <h3 className="text-theme-text font-bold text-base sm:text-lg mb-4 sm:mb-6 relative inline-block">
                 {footerConfig.sections.services.heading || "Services"}
-                <div
-                  className="absolute -bottom-2 left-0 w-12 h-1 rounded-full"
-                  style={{ background: primaryColor }}
-                />
+                <div className="absolute -bottom-2 left-0 w-12 h-1 rounded-full bg-theme-primary" />
               </h3>
-              <ul className="space-y-3">
+              <ul className="space-y-2 sm:space-y-3">
                 {serviceLinks.map((link: any, idx: number) => (
                   <li key={idx}>
                     <a
                       href={link.url || "#"}
-                      className="text-sm text-gray-600 hover:text-gray-900 transition-all duration-200 flex items-center gap-2 group"
-                      onMouseEnter={(e) =>
-                        (e.currentTarget.style.color = primaryColor)
-                      }
-                      onMouseLeave={(e) => (e.currentTarget.style.color = "")}
+                      className="text-xs sm:text-sm text-theme-neutral hover:text-theme-primary transition-all duration-200 flex items-center justify-start gap-2 group"
                     >
-                      <span
-                        className="w-0 h-0.5 group-hover:w-4 transition-all duration-200"
-                        style={{ background: primaryColor }}
-                      />
+                      <span className="w-0 h-0.5 group-hover:w-4 transition-all duration-200 bg-theme-primary" />
                       {link.name}
                     </a>
                   </li>
@@ -212,29 +173,19 @@ function Footer({ data }: FooterProps) {
           {/* Resources Section */}
           {footerConfig.sections?.resources?.show &&
             resourceLinks.length > 0 && (
-              <div>
-                <h3 className="text-gray-900 font-bold text-lg mb-6 relative inline-block">
+              <div className="text-center sm:text-left">
+                <h3 className="text-theme-text font-bold text-base sm:text-lg mb-4 sm:mb-6 relative inline-block">
                   {footerConfig.sections.resources.heading || "Resources"}
-                  <div
-                    className="absolute -bottom-2 left-0 w-12 h-1 rounded-full"
-                    style={{ background: primaryColor }}
-                  />
+                  <div className="absolute -bottom-2 left-0 w-12 h-1 rounded-full bg-theme-primary" />
                 </h3>
-                <ul className="space-y-3">
+                <ul className="space-y-2 sm:space-y-3">
                   {resourceLinks.map((link: any, idx: number) => (
                     <li key={idx}>
                       <a
                         href={link.url || "#"}
-                        className="text-sm text-gray-600 hover:text-gray-900 transition-all duration-200 flex items-center gap-2 group"
-                        onMouseEnter={(e) =>
-                          (e.currentTarget.style.color = primaryColor)
-                        }
-                        onMouseLeave={(e) => (e.currentTarget.style.color = "")}
+                        className="text-xs sm:text-sm text-theme-neutral hover:text-theme-primary transition-all duration-200 flex items-center justify-start gap-2 group"
                       >
-                        <span
-                          className="w-0 h-0.5 group-hover:w-4 transition-all duration-200"
-                          style={{ background: primaryColor }}
-                        />
+                        <span className="w-0 h-0.5 group-hover:w-4 transition-all duration-200 bg-theme-primary" />
                         {link.name}
                       </a>
                     </li>
@@ -245,63 +196,43 @@ function Footer({ data }: FooterProps) {
 
           {/* Contact Section */}
           {footerConfig.sections?.contact?.show && (
-            <div>
-              <h3 className="text-gray-900 font-bold text-lg mb-6 relative inline-block">
+            <div className="text-left">
+              <h3 className="text-theme-text font-bold text-base sm:text-lg mb-4 sm:mb-6 relative inline-block">
                 {footerConfig.sections.contact.heading || "Contact"}
-                <div
-                  className="absolute -bottom-2 left-0 w-12 h-1 rounded-full"
-                  style={{ background: primaryColor }}
-                />
+                <div className="absolute -bottom-2 left-0 w-12 h-1 rounded-full bg-theme-primary" />
               </h3>
-              <ul className="space-y-4">
+              <ul className="space-y-3 sm:space-y-4">
                 {contactInfo.address && (
-                  <li className="flex items-start gap-3 group">
-                    <div
-                      className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-gray-100 border border-gray-200 group-hover:shadow-md transition-all"
-                      style={{ color: primaryColor }}
-                    >
-                      <MapPin size={16} />
+                  <li className="flex items-start justify-start gap-2 sm:gap-3 group">
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-theme-neutral/10 border border-theme-neutral/20 group-hover:shadow-md transition-all text-theme-primary">
+                      <MapPin size={14} className="sm:w-4 sm:h-4" />
                     </div>
-                    <span className="text-sm whitespace-pre-line text-gray-600 leading-relaxed">
+                    <span className="text-xs sm:text-sm whitespace-pre-line text-theme-neutral leading-relaxed text-left">
                       {contactInfo.address}
                     </span>
                   </li>
                 )}
                 {contactInfo.phone && (
-                  <li className="flex items-center gap-3 group">
-                    <div
-                      className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-gray-100 border border-gray-200 group-hover:shadow-md transition-all"
-                      style={{ color: primaryColor }}
-                    >
-                      <Phone size={16} />
+                  <li className="flex items-center justify-start gap-2 sm:gap-3 group">
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-theme-neutral/10 border border-theme-neutral/20 group-hover:shadow-md transition-all text-theme-primary">
+                      <Phone size={14} className="sm:w-4 sm:h-4" />
                     </div>
                     <a
                       href={`tel:${contactInfo.phone.replace(/\D/g, "")}`}
-                      className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
-                      onMouseEnter={(e) =>
-                        (e.currentTarget.style.color = primaryColor)
-                      }
-                      onMouseLeave={(e) => (e.currentTarget.style.color = "")}
+                      className="text-xs sm:text-sm text-theme-neutral hover:text-theme-primary transition-colors"
                     >
                       {contactInfo.phone}
                     </a>
                   </li>
                 )}
                 {contactInfo.email && (
-                  <li className="flex items-center gap-3 group">
-                    <div
-                      className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-gray-100 border border-gray-200 group-hover:shadow-md transition-all"
-                      style={{ color: primaryColor }}
-                    >
-                      <Mail size={16} />
+                  <li className="flex items-center justify-start gap-2 sm:gap-3 group">
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-theme-neutral/10 border border-theme-neutral/20 group-hover:shadow-md transition-all text-theme-primary">
+                      <Mail size={14} className="sm:w-4 sm:h-4" />
                     </div>
                     <a
                       href={`mailto:${contactInfo.email}`}
-                      className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
-                      onMouseEnter={(e) =>
-                        (e.currentTarget.style.color = primaryColor)
-                      }
-                      onMouseLeave={(e) => (e.currentTarget.style.color = "")}
+                      className="text-xs sm:text-sm text-theme-neutral hover:text-theme-primary transition-colors"
                     >
                       {contactInfo.email}
                     </a>
@@ -313,10 +244,10 @@ function Footer({ data }: FooterProps) {
         </div>
 
         {/* Bottom Bar - ALWAYS SHOW */}
-        <div className="pt-8 mt-12 border-t border-gray-200">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="pt-6 sm:pt-8 mt-8 sm:mt-10 lg:mt-12 border-t border-theme-neutral/20">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-3 sm:gap-4">
             {/* DYNAMIC COPYRIGHT TEXT */}
-            <p className="text-sm text-gray-600 text-center md:text-left flex items-center gap-2 justify-center md:justify-start">
+            <p className="text-xs sm:text-sm text-theme-neutral text-center md:text-left flex items-center gap-2 justify-center md:justify-start">
               {footerConfig.copyright_text ||
                 `${new Date().getFullYear()} ${
                   data.title
@@ -325,22 +256,15 @@ function Footer({ data }: FooterProps) {
 
             {/* Legal Links */}
             {legalLinks.length > 0 && (
-              <div className="flex gap-6 text-sm flex-wrap justify-center md:justify-end">
+              <div className="flex gap-4 sm:gap-6 text-xs sm:text-sm flex-wrap justify-center md:justify-end">
                 {legalLinks.map((link: any, idx: number) => (
                   <a
                     key={idx}
                     href={link.url}
-                    className="text-gray-600 hover:text-gray-900 transition-all duration-200 relative group"
-                    onMouseEnter={(e) =>
-                      (e.currentTarget.style.color = primaryColor)
-                    }
-                    onMouseLeave={(e) => (e.currentTarget.style.color = "")}
+                    className="text-theme-neutral hover:text-theme-primary transition-all duration-200 relative group"
                   >
                     {link.name}
-                    <span
-                      className="absolute -bottom-1 left-0 w-0 h-0.5 group-hover:w-full transition-all duration-200"
-                      style={{ background: primaryColor }}
-                    />
+                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 group-hover:w-full transition-all duration-200 bg-theme-primary" />
                   </a>
                 ))}
               </div>

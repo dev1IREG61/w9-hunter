@@ -1,269 +1,303 @@
 import { useState } from "react";
-import {
-  User,
-  Briefcase,
-  UserCheck,
-  Laptop,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import EasyIcon from "./IconRenderer";
 
-const MarketingProblemSolution = () => {
-  const [selectedPersona, setSelectedPersona] = useState("marketing");
-  const [startIndex, setStartIndex] = useState(0);
+const API_BASE_URL = "https://esign-admin.signmary.com";
+
+const getFullImageUrl = (url: string): string => {
+  if (!url) return "";
+  if (url.startsWith("http")) return url;
+  return `${API_BASE_URL}${url}`;
+};
+
+interface ProblemSolutionProps {
+  data?: {
+    heading?: string;
+    introduction?: string;
+    items?: Array<{
+      name?: string;
+      status_heading?: string;
+      status_description?: string;
+      image?: {
+        url: string;
+        title?: string;
+      };
+      background_image?: any;
+      icon_text_pairs?: Array<{
+        icon?: string;
+        text?: string;
+      }>;
+    }>;
+    background_image?: any;
+    color_theme?: {
+      primary_color?: string;
+      secondary_color?: string;
+      background_color?: string;
+      text_color?: string;
+      neutral_color?: string;
+    };
+  };
+}
+
+const MarketingProblemSolution = ({ data }: ProblemSolutionProps) => {
+  const primaryColor = data?.color_theme?.primary_color || "#3B82F6";
+  const secondaryColor = data?.color_theme?.secondary_color || "#1E40AF";
+
+  const personas =
+    data?.items?.map((item, index) => ({
+      id: item.name?.toLowerCase().replace(/\s+/g, "-") || `persona-${index}`,
+      title: item.name || "",
+      statusHeading: item.status_heading || "",
+      statusDescription: item.status_description?.replace(/<[^>]*>/g, "") || "",
+      image: item.image ? getFullImageUrl(item.image.url) : null,
+      iconTextPairs: item.icon_text_pairs || [],
+    })) || [];
+
+  const [currentIndex, setCurrentIndex] = useState(0);
   const visibleCount = 3;
 
-  const personas = [
-    {
-      id: "founder",
-      title: "The Busy Founder",
-      icon: Briefcase,
-      color: "gray",
-    },
-    {
-      id: "marketing",
-      title: "The Marketing Lead",
-      icon: User,
-      color: "blue",
-      problems: [
-        "Stop fighting with spreadsheets",
-        "Marching modimts and content analysis",
-        "Solven slated marketing with spreadsheets",
-      ],
-      solutions: [
-        "Automate your content workflow",
-        "Get real-time analytics dashboard",
-        "Unified marketing platform",
-      ],
-    },
-    {
-      id: "sales",
-      title: "The Sales Manager",
-      icon: UserCheck,
-      color: "gray",
-    },
-    {
-      id: "it",
-      title: "The IT Admin",
-      icon: Laptop,
-      color: "gray",
-    },
-  ];
+  // Calculate which personas to show (always show 3, with current in middle when possible)
+  const getVisiblePersonas = () => {
+    if (personas.length <= visibleCount) {
+      return personas;
+    }
 
-  const visiblePersonas = personas.slice(startIndex, startIndex + visibleCount);
-  const showNavigation = personas.length > visibleCount;
+    const start = Math.max(
+      0,
+      Math.min(currentIndex - 1, personas.length - visibleCount)
+    );
+    return personas.slice(start, start + visibleCount);
+  };
+
+  const visiblePersonas = getVisiblePersonas();
+
+  // Find which position the current persona is at in the visible array
+  const currentPersonaInVisible = visiblePersonas.findIndex(
+    (p) => p.id === personas[currentIndex]?.id
+  );
+  const selectedPersona = personas[currentIndex];
 
   const handlePrevious = () => {
-    setStartIndex(Math.max(0, startIndex - 1));
+    setCurrentIndex((prev) => Math.max(0, prev - 1));
   };
 
   const handleNext = () => {
-    setStartIndex(Math.min(personas.length - visibleCount, startIndex + 1));
+    setCurrentIndex((prev) => Math.min(personas.length - 1, prev + 1));
   };
 
-  const selectedPersonaData = personas.find((p) => p.id === selectedPersona);
+  const canGoPrevious = currentIndex > 0;
+  const canGoNext = currentIndex < personas.length - 1;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen" style={{ backgroundColor: data?.color_theme?.background_color || "#F9FAFB" }}>
       {/* Header Section */}
-      <div className="bg-white py-16 px-4">
+      <div
+        className="py-12 sm:py-14 md:py-16 px-4"
+        style={{
+          backgroundColor: data?.color_theme?.background_color || "#FFFFFF",
+        }}
+      >
         <div className="max-w-6xl mx-auto">
-          <h1 className="text-5xl font-bold text-center mb-16">
-            Who are you, and what's
-            <br />
-            slowing you down?
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-8 sm:mb-12 md:mb-16">
+            {data?.heading || "Who are you, and what's slowing you down?"}
           </h1>
 
           {/* Persona Selection */}
-          <div className="relative flex justify-center items-center">
+          <div className="relative flex justify-center items-center px-4 sm:px-0">
             {/* Left Navigation Button */}
-            {showNavigation && (
-              <button
-                onClick={handlePrevious}
-                disabled={startIndex === 0}
-                className={`absolute left-0 z-10 w-12 h-12 rounded-full bg-white shadow-lg flex items-center justify-center transition-all ${
-                  startIndex === 0
-                    ? "opacity-30 cursor-not-allowed"
-                    : "hover:bg-blue-50 hover:shadow-xl"
-                }`}
-              >
-                <ChevronLeft className="w-6 h-6 text-blue-600" />
-              </button>
-            )}
+            <button
+              onClick={handlePrevious}
+              disabled={!canGoPrevious}
+              className={`absolute left-0 z-10 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white shadow-lg flex items-center justify-center transition-all ${
+                !canGoPrevious
+                  ? "opacity-30 cursor-not-allowed"
+                  : "hover:shadow-xl"
+              }`}
+              style={{
+                ...(canGoPrevious && { backgroundColor: `${primaryColor}10` }),
+              }}
+            >
+              <ChevronLeft
+                className="w-6 h-6"
+                style={{ color: primaryColor }}
+              />
+            </button>
 
             {/* Personas */}
-            <div className="flex justify-center items-end gap-8 mb-8">
-              {visiblePersonas.map((persona) => {
-                const Icon = persona.icon;
-                const isSelected = selectedPersona === persona.id;
+            <div className="flex justify-center items-end gap-4 sm:gap-6 md:gap-8 mb-6 sm:mb-8">
+              {visiblePersonas.map((persona, index) => {
+                const isSelected = index === currentPersonaInVisible;
+                const actualIndex = personas.findIndex(
+                  (p) => p.id === persona.id
+                );
 
                 return (
-                  <button
+                  <div
                     key={persona.id}
-                    onClick={() => setSelectedPersona(persona.id)}
-                    className="flex flex-col items-center transition-all duration-300 focus:outline-none group"
+                    className="flex flex-col items-center transition-all duration-300 cursor-pointer"
+                    onClick={() => setCurrentIndex(actualIndex)}
                   >
                     <div
                       className={`relative rounded-full transition-all duration-300 ${
                         isSelected
-                          ? "w-44 h-44 mb-4"
-                          : "w-32 h-32 mb-2 opacity-40 grayscale hover:opacity-60"
+                          ? "w-28 h-28 sm:w-36 sm:h-36 md:w-44 md:h-44 mb-3 sm:mb-4"
+                          : "w-20 h-20 sm:w-24 sm:h-24 md:w-32 md:h-32 mb-2 opacity-40 grayscale"
                       }`}
                     >
                       <div
-                        className={`absolute inset-0 rounded-full ${
-                          isSelected
-                            ? "bg-gradient-to-br from-blue-400 to-blue-600 p-1"
-                            : "bg-gray-200"
-                        }`}
+                        className="absolute inset-0 rounded-full p-1"
+                        style={{
+                          background: isSelected
+                            ? `linear-gradient(135deg, ${primaryColor}, ${secondaryColor})`
+                            : "#E5E7EB",
+                        }}
                       >
                         <div className="w-full h-full rounded-full bg-white flex items-center justify-center">
                           <div
                             className={`rounded-full ${
-                              isSelected
-                                ? "w-36 h-36 bg-gradient-to-br from-blue-500 to-blue-700"
-                                : "w-28 h-28 bg-gray-300"
-                            } flex items-center justify-center`}
+                              isSelected ? "w-24 h-24 sm:w-32 sm:h-32 md:w-36 md:h-36" : "w-16 h-16 sm:w-20 sm:h-20 md:w-28 md:h-28"
+                            } flex items-center justify-center overflow-hidden bg-gray-100`}
                           >
-                            {isSelected ? (
-                              <div className="w-32 h-32 rounded-full bg-blue-600 flex items-center justify-center">
-                                <div className="text-white">
-                                  <div className="w-20 h-20 mx-auto mb-2 bg-white/20 rounded-full flex items-center justify-center">
-                                    <div className="w-12 h-12 bg-white/30 rounded-full"></div>
-                                  </div>
-                                  <div className="w-24 h-16 bg-white/20 rounded-t-full"></div>
+                            {persona.image ? (
+                              <img
+                                src={persona.image}
+                                alt={persona.title}
+                                className="w-full h-full object-cover"
+                                onError={() => {
+                                  console.error(
+                                    "Image failed to load:",
+                                    persona.image
+                                  );
+                                }}
+                              />
+                            ) : (
+                              <div
+                                className={`${
+                                  isSelected ? "w-20 h-20 sm:w-28 sm:h-28 md:w-32 md:h-32" : "w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24"
+                                } rounded-full flex items-center justify-center`}
+                                style={{ backgroundColor: primaryColor }}
+                              >
+                                <div className="text-white text-lg sm:text-xl md:text-2xl font-bold">
+                                  {persona.title?.charAt(0) || "?"}
                                 </div>
                               </div>
-                            ) : (
-                              <Icon className="w-16 h-16 text-gray-500" />
                             )}
                           </div>
                         </div>
                       </div>
                     </div>
                     <p
-                      className={`text-sm font-medium transition-all ${
-                        isSelected ? "text-gray-900 text-base" : "text-gray-400"
-                      }`}
+                      className="text-xs sm:text-sm font-medium transition-all"
+                      style={{
+                        color: isSelected ? primaryColor : "#9CA3AF",
+                        fontSize: isSelected ? "0.875rem" : "0.75rem",
+                      }}
                     >
                       {persona.title}
                     </p>
-                  </button>
+                  </div>
                 );
               })}
             </div>
 
             {/* Right Navigation Button */}
-            {showNavigation && (
-              <button
-                onClick={handleNext}
-                disabled={startIndex >= personas.length - visibleCount}
-                className={`absolute right-0 z-10 w-12 h-12 rounded-full bg-white shadow-lg flex items-center justify-center transition-all ${
-                  startIndex >= personas.length - visibleCount
-                    ? "opacity-30 cursor-not-allowed"
-                    : "hover:bg-blue-50 hover:shadow-xl"
-                }`}
-              >
-                <ChevronRight className="w-6 h-6 text-blue-600" />
-              </button>
-            )}
+            <button
+              onClick={handleNext}
+              disabled={!canGoNext}
+              className={`absolute right-0 z-10 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white shadow-lg flex items-center justify-center transition-all ${
+                !canGoNext ? "opacity-30 cursor-not-allowed" : "hover:shadow-xl"
+              }`}
+              style={{
+                ...(canGoNext && { backgroundColor: `${primaryColor}10` }),
+              }}
+            >
+              <ChevronRight
+                className="w-6 h-6"
+                style={{ color: primaryColor }}
+              />
+            </button>
           </div>
+
+          {/* Progress Indicator */}
+          {personas.length > 1 && (
+            <div className="flex justify-center gap-1.5 sm:gap-2 mt-3 sm:mt-4">
+              {personas.map((_, index) => (
+                <div
+                  key={index}
+                  className="h-1.5 sm:h-2 rounded-full transition-all"
+                  style={{
+                    width: index === currentIndex ? "1.5rem" : "0.5rem",
+                    backgroundColor:
+                      index === currentIndex ? primaryColor : "#D1D5DB",
+                  }}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
       {/* Problem-Solution Section */}
-      {selectedPersonaData && selectedPersonaData.problems && (
-        <div className="max-w-5xl mx-auto px-4 py-5">
-          <div className="bg-white rounded-3xl shadow-xl p-12 border border-blue-500">
-            <div className="flex gap-1 items-start">
-              {/* Left Side - Problems */}
-              <div className="w-1/2">
-                <h2 className="mb-8">
-                  <span className="text-blue-600 text-3xl font-bold">
-                    For Marketers:
-                  </span>
-                  <br />
-                  <span className="text-4xl font-bold text-gray-900">
-                    Stop fighting with spreadsheets
-                  </span>
-                </h2>
-              </div>
-
-              {/* Right Side - Problem Items */}
-              <div className="w-1/2 space-y-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 flex-shrink-0 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <svg
-                      className="w-6 h-6 text-blue-600"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
+      {selectedPersona &&
+        selectedPersona.iconTextPairs &&
+        selectedPersona.iconTextPairs.length > 0 && (
+          <div className="max-w-5xl mx-auto px-4 py-4 sm:py-5">
+            <div
+              className="bg-white rounded-2xl sm:rounded-3xl shadow-xl p-6 sm:p-8 md:p-10 lg:p-12 border-2 transition-all duration-300"
+              style={{ borderColor: primaryColor }}
+            >
+              <div className="flex flex-col lg:flex-row gap-6 sm:gap-8 md:gap-10 lg:gap-12 items-start">
+                {/* Left Side - Status Header */}
+                <div className="w-full lg:w-1/2">
+                  <h2 className="mb-6 sm:mb-8">
+                    <span
+                      className="text-xl sm:text-2xl md:text-3xl font-bold block mb-2"
+                      style={{ color: primaryColor }}
                     >
-                      <rect
-                        x="3"
-                        y="3"
-                        width="18"
-                        height="18"
-                        rx="2"
-                        strokeWidth="2"
-                      />
-                      <path d="M3 9h18M9 3v18" strokeWidth="2" />
-                    </svg>
-                  </div>
-                  <div>
-                    <p className="font-semibold text-gray-900 mb-1">
-                      Problem-canonn: Stop fighting with spreadsheets
-                    </p>
-                  </div>
+                      {selectedPersona.statusHeading}
+                    </span>
+                    <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900">
+                      {selectedPersona.statusDescription}
+                    </span>
+                  </h2>
                 </div>
 
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 flex-shrink-0 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <svg
-                      className="w-6 h-6 text-blue-600"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <circle cx="12" cy="12" r="3" strokeWidth="2" />
-                      <path
-                        d="M12 2v4m0 12v4M2 12h4m12 0h4m-3.05-7.05l-2.83 2.83m-5.66 5.66l-2.83 2.83m12.02 0l-2.83-2.83m-5.66-5.66l-2.83-2.83"
-                        strokeWidth="2"
-                      />
-                    </svg>
-                  </div>
-                  <div>
-                    <p className="font-semibold text-gray-900 mb-1">
-                      Problem Inters nmarching modimts and content analysis
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 flex-shrink-0 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <svg
-                      className="w-6 h-6 text-blue-600"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                        strokeWidth="2"
-                      />
-                    </svg>
-                  </div>
-                  <div>
-                    <p className="font-semibold text-gray-900 mb-1">
-                      Problem Solven slated marketing with spreadsheets
-                    </p>
-                  </div>
+                {/* Right Side - Icon Text Pairs */}
+                <div className="w-full lg:w-1/2 space-y-4 sm:space-y-5 md:space-y-6">
+                  {selectedPersona.iconTextPairs.map(
+                    (pair: any, index: number) => {
+                      const iconName = pair.icon?.split("/").pop() || "";
+                      const itemColor = index === 0 ? "#EF4444" : "#10B981";
+                      return (
+                        <div key={index} className="flex items-start gap-3 sm:gap-4">
+                          <div
+                            className="w-10 h-10 sm:w-12 sm:h-12 flex-shrink-0 rounded-lg flex items-center justify-center"
+                            style={{ backgroundColor: `${itemColor}15` }}
+                          >
+                            <EasyIcon
+                              icon={iconName}
+                              size={20}
+                              color={itemColor}
+                              className="sm:w-6 sm:h-6"
+                            />
+                          </div>
+                          <div>
+                            <p
+                              className="text-sm sm:text-base font-semibold mb-1"
+                              style={{ color: itemColor }}
+                            >
+                              {pair.text}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    }
+                  )}
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
     </div>
   );
 };

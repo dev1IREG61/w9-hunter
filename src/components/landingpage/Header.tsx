@@ -18,14 +18,9 @@ const Header: React.FC<HeaderProps> = ({ data, onShowLogin }) => {
     header_cta_secondary,
     header_cta_secondary_url,
     header_section_image,
-    color_theme,
   } = data;
 
-  const primaryColor = color_theme?.primary_color || "#6366F1";
-  const accentColor = color_theme?.accent_color || "#8B5CF6";
-  const textColor = color_theme?.text_color || "#1F2937";
-  const neutralColor = color_theme?.neutral_color || "#6B7280";
-  const bgColor = color_theme?.background_color || "#FFFFFF";
+  const primaryColor = "var(--color-primary)";
 
   const [isBlinking, setIsBlinking] = useState(false);
 
@@ -72,9 +67,8 @@ const Header: React.FC<HeaderProps> = ({ data, onShowLogin }) => {
   return (
     <header
       ref={ref}
-      className="relative flex items-center justify-center overflow-hidden min-h-screen"
+      className="relative top-7 flex items-center justify-center overflow-hidden min-h-screen bg-theme-background"
       style={{
-        backgroundColor: bgColor,
         backgroundImage: backgroundImageUrl
           ? `url(${backgroundImageUrl})`
           : "none",
@@ -84,33 +78,38 @@ const Header: React.FC<HeaderProps> = ({ data, onShowLogin }) => {
     >
       {/* Simple background */}
       <div
-        className="absolute inset-0 bg-gradient-to-br from-gray-50 to-gray-100"
+        className="absolute inset-0 bg-gradient-to-br from-theme-neutral/5 to-theme-neutral/10"
         style={{ opacity: backgroundImageUrl ? 0.3 : 1 }}
       />
 
       {/* Content Container */}
       <motion.div
-        className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 py-20 max-w-7xl"
+        className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 md:py-20 max-w-7xl"
         style={{ y, opacity }}
       >
-        <div className="flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-8">
+        <div className="flex flex-col lg:flex-row items-center justify-between gap-8 sm:gap-10 lg:gap-12">
           {/* Text Content - Left Side */}
           <motion.div
-            className="lg:w-1/2 text-left"
+            className="lg:w-1/2 text-center lg:text-left w-full"
             initial={{ opacity: 0, x: -50 }}
             animate={isInView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
           >
-            <div className="max-w-xl">
+            <div className="max-w-xl mx-auto lg:mx-0">
               {/* Top Badge */}
               <motion.div
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 border border-blue-200 mb-8"
+                className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border-2 mb-6 sm:mb-8 bg-theme-primary/10 border-theme-primary/25"
                 initial={{ opacity: 0, y: 20 }}
                 animate={isInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ delay: 0.2, duration: 0.6 }}
               >
-                <EasyIcon icon="FiSmartphone" size={16} color={primaryColor} />
-                <span className="text-sm font-medium text-blue-700">
+                <EasyIcon
+                  icon="FiSmartphone"
+                  size={14}
+                  color="var(--color-primary)"
+                  className="sm:w-4 sm:h-4"
+                />
+                <span className="text-xs sm:text-sm font-medium text-theme-primary">
                   {header_subtitle ||
                     "Add iOS 16 Passkeys to your website with OwnID"}
                 </span>
@@ -119,21 +118,27 @@ const Header: React.FC<HeaderProps> = ({ data, onShowLogin }) => {
               {/* Main Title */}
               {header_title && (
                 <motion.h1
-                  className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-6"
-                  style={{ color: textColor }}
+                  className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-4 sm:mb-6 text-theme-text"
                   initial={{ opacity: 0, y: 30 }}
                   animate={isInView ? { opacity: 1, y: 0 } : {}}
                   transition={{ delay: 0.3, duration: 0.7 }}
                 >
-                  {header_title}
+                  {header_title.split(" ").map((word, i) => (
+                    <span
+                      key={i}
+                      className={i >= 1 && i <= 3 ? "text-theme-primary" : ""}
+                    >
+                      {word}
+                      {i < header_title.split(" ").length - 1 ? " " : ""}
+                    </span>
+                  ))}
                 </motion.h1>
               )}
 
               {/* Subtitle */}
               {header_description && (
                 <motion.p
-                  className="text-xl lg:text-2xl mb-8 leading-relaxed font-light"
-                  style={{ color: neutralColor }}
+                  className="text-base sm:text-lg md:text-xl lg:text-2xl mb-6 sm:mb-8 leading-relaxed font-light text-theme-neutral"
                   initial={{ opacity: 0, y: 20 }}
                   animate={isInView ? { opacity: 1, y: 0 } : {}}
                   transition={{ delay: 0.5, duration: 0.7 }}
@@ -144,8 +149,7 @@ const Header: React.FC<HeaderProps> = ({ data, onShowLogin }) => {
 
               {/* Description Details */}
               <motion.div
-                className="text-base lg:text-lg mb-10 leading-relaxed"
-                style={{ color: neutralColor }}
+                className="text-sm sm:text-base lg:text-lg mb-8 sm:mb-10 leading-relaxed text-theme-neutral"
                 initial={{ opacity: 0, y: 20 }}
                 animate={isInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ delay: 0.7, duration: 0.7 }}
@@ -167,7 +171,7 @@ const Header: React.FC<HeaderProps> = ({ data, onShowLogin }) => {
 
               {/* CTAs */}
               <motion.div
-                className="flex flex-col sm:flex-row items-start gap-4 mb-12"
+                className="flex flex-col sm:flex-row items-center lg:items-start gap-3 sm:gap-4 mb-8 sm:mb-12 w-full sm:w-auto"
                 initial={{ opacity: 0, y: 20 }}
                 animate={isInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ delay: 0.9, duration: 0.6 }}
@@ -180,10 +184,7 @@ const Header: React.FC<HeaderProps> = ({ data, onShowLogin }) => {
                     {header_cta_primary_url ? (
                       <motion.a
                         href={header_cta_primary_url}
-                        className="px-8 py-4 rounded-lg font-semibold text-white cursor-pointer inline-flex items-center gap-3 text-base shadow-lg hover:shadow-xl transition-all duration-200"
-                        style={{
-                          background: `linear-gradient(135deg, ${primaryColor}, ${accentColor})`,
-                        }}
+                        className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold text-white cursor-pointer inline-flex items-center justify-center gap-2 sm:gap-3 text-sm sm:text-base shadow-lg hover:shadow-xl transition-all duration-200 gradient-theme-primary"
                       >
                         {header_cta_primary}
                         <EasyIcon
@@ -195,17 +196,14 @@ const Header: React.FC<HeaderProps> = ({ data, onShowLogin }) => {
                     ) : (
                       <motion.button
                         onClick={handleGetStartedClick}
-                        className="px-8 py-4 rounded-lg font-semibold text-white cursor-pointer inline-flex items-center gap-3 text-base shadow-lg hover:shadow-xl transition-all duration-200 relative overflow-hidden"
-                        style={{
-                          background: `linear-gradient(135deg, ${primaryColor}, ${accentColor})`,
-                        }}
+                        className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold text-white cursor-pointer inline-flex items-center justify-center gap-2 sm:gap-3 text-sm sm:text-base shadow-lg hover:shadow-xl transition-all duration-200 relative overflow-hidden gradient-theme-primary"
                         animate={
                           isBlinking
                             ? {
                                 boxShadow: [
-                                  `0 0 0 0 rgba(99, 102, 241, 0.7)`,
-                                  `0 0 0 20px rgba(99, 102, 241, 0)`,
-                                  `0 0 0 0 rgba(99, 102, 241, 0)`,
+                                  `0 0 0 0 color-mix(in srgb, var(--color-primary) 70%, transparent)`,
+                                  `0 0 0 20px color-mix(in srgb, var(--color-primary) 0%, transparent)`,
+                                  `0 0 0 0 color-mix(in srgb, var(--color-primary) 0%, transparent)`,
                                 ],
                               }
                             : {}
@@ -242,14 +240,14 @@ const Header: React.FC<HeaderProps> = ({ data, onShowLogin }) => {
                     header_cta_secondary_url !== "#login" ? (
                       <motion.a
                         href={header_cta_secondary_url}
-                        className="px-8 py-4 rounded-lg font-semibold cursor-pointer inline-flex items-center gap-2 text-base border-2 border-gray-300 text-gray-700 hover:border-gray-400 hover:text-gray-900 transition-all duration-200"
+                        className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold cursor-pointer inline-flex items-center justify-center gap-2 text-sm sm:text-base border-2 border-theme-neutral/30 text-theme-neutral hover:border-theme-neutral/50 hover:text-theme-text transition-all duration-200"
                       >
                         {header_cta_secondary}
                       </motion.a>
                     ) : (
                       <motion.button
                         onClick={onShowLogin}
-                        className="px-8 py-4 rounded-lg font-semibold cursor-pointer inline-flex items-center gap-2 text-base border-2 border-gray-300 text-gray-700 hover:border-gray-400 hover:text-gray-900 transition-all duration-200"
+                        className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold cursor-pointer inline-flex items-center justify-center gap-2 text-sm sm:text-base border-2 border-theme-neutral/30 text-theme-neutral hover:border-theme-neutral/50 hover:text-theme-text transition-all duration-200"
                       >
                         {header_cta_secondary}
                       </motion.button>
@@ -260,12 +258,12 @@ const Header: React.FC<HeaderProps> = ({ data, onShowLogin }) => {
 
               {/* Trust Indicators */}
               <motion.div
-                className="flex flex-col sm:flex-row items-start gap-4"
+                className="flex flex-col sm:flex-row items-center lg:items-start gap-3 sm:gap-4"
                 initial={{ opacity: 0 }}
                 animate={isInView ? { opacity: 1 } : {}}
                 transition={{ delay: 1, duration: 0.6 }}
               >
-                <div className="flex items-center gap-3 text-sm text-gray-500">
+                <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 text-xs sm:text-sm text-gray-500">
                   <div className="flex items-center gap-2">
                     <div className="w-2 h-2 rounded-full bg-green-500" />
                     <span>More registrations</span>
@@ -281,17 +279,17 @@ const Header: React.FC<HeaderProps> = ({ data, onShowLogin }) => {
 
           {/* Image Section - Right Side */}
           <motion.div
-            className="lg:w-1/2 flex items-center justify-center lg:justify-end mt-8 lg:mt-0"
+            className="lg:w-1/2 flex items-center justify-center lg:justify-end mt-6 sm:mt-8 lg:mt-0 w-full"
             initial={{ opacity: 0, x: 50, scale: 0.9 }}
             animate={isInView ? { opacity: 1, x: 0, scale: 1 } : {}}
             transition={{ duration: 1, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
           >
-            <div className="relative w-full max-w-md">
+            <div className="relative w-full max-w-sm sm:max-w-md px-4 sm:px-0">
               {rightImageUrl ? (
                 <div className="relative">
                   {/* Main Image Container */}
                   <motion.div
-                    className="relative rounded-2xl overflow-hidden bg-white shadow-2xl border border-gray-200"
+                    className="relative rounded-2xl overflow-hidden bg-theme-background shadow-2xl border border-theme-neutral/20"
                     whileHover={{
                       y: -5,
                       scale: 1.01,
@@ -310,7 +308,7 @@ const Header: React.FC<HeaderProps> = ({ data, onShowLogin }) => {
                 </div>
               ) : (
                 <motion.div
-                  className="w-full h-[400px] rounded-2xl flex flex-col items-center justify-center p-8 text-center relative bg-gray-100 border-2 border-dashed border-gray-300"
+                  className="w-full h-[300px] sm:h-[350px] md:h-[400px] rounded-2xl flex flex-col items-center justify-center p-6 sm:p-8 text-center relative bg-theme-neutral/10 border-2 border-dashed border-theme-neutral/30"
                   whileHover={{
                     scale: 1.02,
                     borderColor: primaryColor,
@@ -319,11 +317,11 @@ const Header: React.FC<HeaderProps> = ({ data, onShowLogin }) => {
                 >
                   <EasyIcon
                     icon="FiImage"
-                    size={48}
+                    size={40}
                     color={primaryColor}
-                    className="opacity-40"
+                    className="opacity-40 sm:w-12 sm:h-12"
                   />
-                  <p className="text-base font-medium mt-4 text-gray-500">
+                  <p className="text-sm sm:text-base font-medium mt-4 text-theme-neutral">
                     Add an image to showcase your product
                   </p>
                 </motion.div>

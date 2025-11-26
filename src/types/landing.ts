@@ -184,14 +184,37 @@ export interface ProblemSolutionSection {
 }
 
 export interface HowItWorksStep {
-  title: string;
-  description: string;
+  step_number?: string;
+  title?: string;
+  description?: string;
   icon?: string;
+  content?: Array<{
+    icon?: string;
+    title?: string;
+    description?: string;
+  }>;
+  video?: {
+    id?: number;
+    title?: string;
+    video_source?: string;
+    video_url: string;
+    thumbnail?: {
+      id?: number;
+      title?: string;
+      url?: string;
+      width?: number;
+      height?: number;
+    };
+  };
+  image?: string;
 }
 
 export interface HowItWorksSection {
   heading: string;
   description?: string;
+  icon?: string;
+  image?: string | null;
+  background_image?: string | null;
   steps: HowItWorksStep[];
 }
 
@@ -250,6 +273,9 @@ export interface LandingPageData {
   cta_secondary_text?: string;
   cta_secondary_url?: string;
   cta_offer?: string;
+  secondary_cta_heading?: string;
+  secondary_cta_description?: string;
+  secondary_cta_button_text?: string;
   meta_title?: string;
   meta_description?: string;
   og_image?: ImageData;
