@@ -103,9 +103,9 @@ const Features: React.FC<FeaturesProps> = ({ data }) => {
                   >
                     {/* Card container */}
                     <div className="relative h-full p-8 sm:p-10 rounded-2xl transition-all duration-500 border backdrop-blur-sm overflow-hidden bg-theme-background border-theme-primary/10 hover:shadow-lg">
-                      {/* Subtle hover gradient */}
+                      {/* Always visible gradient (changes opacity on navigation) */}
                       <div
-                        className="absolute inset-0 rounded-2xl opacity-5 transition-opacity duration-500 hover:opacity-100 -z-10"
+                        className="absolute inset-0 rounded-2xl opacity-50 transition-opacity duration-500 -z-10"
                         style={{
                           background: `radial-gradient(circle at top left, var(--color-primary), transparent 60%)`,
                         }}
@@ -146,10 +146,65 @@ const Features: React.FC<FeaturesProps> = ({ data }) => {
                         {feature.title}
                       </h3>
 
-                      {/* Description */}
-                      <p className="text-sm sm:text-base leading-relaxed text-pretty text-theme-neutral">
-                        {feature.description}
-                      </p>
+                      {/* Description with auto-formatting */}
+                      {(() => {
+                        const description = feature.description || "";
+                        // Split by bullet point indicators (•, -, *, or newlines with dashes)
+                        const bulletRegex = /[•\-\*]\s+/;
+                        const parts = description
+                          .split(/\n|(?=[•\-\*]\s+)/)
+                          .filter((text) => text.trim());
+
+                        // Check if we have bullet points
+                        const hasBullets = parts.some((part) =>
+                          bulletRegex.test(part)
+                        );
+
+                        if (hasBullets && parts.length > 1) {
+                          // Extract intro text (before first bullet)
+                          const introText = parts[0]
+                            .replace(bulletRegex, "")
+                            .trim();
+                          const showIntro =
+                            introText && !bulletRegex.test(parts[0]);
+
+                          // Extract bullet items
+                          const bullets = parts
+                            .slice(showIntro ? 1 : 0)
+                            .map((part) => part.replace(bulletRegex, "").trim())
+                            .filter(Boolean);
+
+                          return (
+                            <div>
+                              {showIntro && (
+                                <p className="text-sm sm:text-base leading-relaxed mb-6 text-theme-neutral">
+                                  {introText}
+                                </p>
+                              )}
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                                {bullets.map((bullet, idx) => (
+                                  <div
+                                    key={idx}
+                                    className="flex items-start gap-3 p-3 rounded-lg transition-all duration-300 bg-theme-primary/5 border border-theme-primary/10"
+                                  >
+                                    <div className="flex-shrink-0 w-1.5 h-1.5 rounded-full mt-2 bg-theme-primary" />
+                                    <p className="text-sm leading-relaxed text-theme-neutral flex-1">
+                                      {bullet}
+                                    </p>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          );
+                        }
+
+                        // No bullets, show as regular text
+                        return (
+                          <p className="text-sm sm:text-base leading-relaxed text-pretty text-theme-neutral">
+                            {description}
+                          </p>
+                        );
+                      })()}
                     </div>
                   </div>
                 ))}
