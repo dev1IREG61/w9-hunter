@@ -102,10 +102,10 @@ const Features: React.FC<FeaturesProps> = ({ data }) => {
                     className="w-full flex-shrink-0 px-2 sm:px-4"
                   >
                     {/* Card container */}
-                    <div className="relative h-full p-8 sm:p-10 rounded-2xl transition-all duration-500 border backdrop-blur-sm overflow-hidden bg-theme-background border-theme-primary/10 hover:shadow-lg">
+                    <div className="relative h-full p-8 sm:p-10 rounded-2xl transition-all duration-500 border backdrop-blur-sm overflow-hidden bg-theme-background border-theme-primary hover:shadow-lg">
                       {/* Always visible gradient (changes opacity on navigation) */}
                       <div
-                        className="absolute inset-0 rounded-2xl opacity-50 transition-opacity duration-500 -z-10"
+                        className="absolute inset-0 rounded-2xl opacity-20 transition-opacity duration-500 -z-10 hover:opacity-80"
                         style={{
                           background: `radial-gradient(circle at top left, var(--color-primary), transparent 60%)`,
                         }}
