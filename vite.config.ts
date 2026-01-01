@@ -1,8 +1,13 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import viteCompression from "vite-plugin-compression";
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    viteCompression({ algorithm: "gzip", ext: ".gz" }),
+    viteCompression({ algorithm: "brotliCompress", ext: ".br" }),
+  ],
   server: {
     proxy: {
       "/blogs/api": {
@@ -22,5 +27,20 @@ export default defineConfig({
   },
   build: {
     outDir: "dist",
+    sourcemap: false,
+    minify: "terser",
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          "react-vendor": ["react", "react-dom"],
+          "framer": ["framer-motion"],
+          "icons": ["lucide-react", "react-icons"],
+        },
+        chunkFileNames: "assets/[name]-[hash].js",
+        entryFileNames: "assets/[name]-[hash].js",
+        assetFileNames: "assets/[name]-[hash].[ext]",
+      },
+    },
+    chunkSizeWarningLimit: 500,
   },
 });

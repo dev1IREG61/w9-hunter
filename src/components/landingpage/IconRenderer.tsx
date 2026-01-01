@@ -1,43 +1,8 @@
 import React from "react";
-import * as FiIcons from "react-icons/fi";
-import * as FaIcons from "react-icons/fa";
-import * as MdIcons from "react-icons/md";
-import * as HiIcons from "react-icons/hi";
-import * as IoIcons from "react-icons/io5";
-import * as AiIcons from "react-icons/ai";
-import * as BiIcons from "react-icons/bi";
-import * as BsIcons from "react-icons/bs";
-import * as CgIcons from "react-icons/cg";
-import * as GiIcons from "react-icons/gi";
-import * as GrIcons from "react-icons/gr";
-import * as RiIcons from "react-icons/ri";
-import * as SiIcons from "react-icons/si";
-import * as TbIcons from "react-icons/tb";
-import * as TiIcons from "react-icons/ti";
-import * as LuIcons from "lucide-react";
-
-// Combine all icons into one object
-const ALL_ICONS: Record<string, any> = {
-  ...FiIcons,
-  ...FaIcons,
-  ...MdIcons,
-  ...HiIcons,
-  ...IoIcons,
-  ...AiIcons,
-  ...BiIcons,
-  ...BsIcons,
-  ...CgIcons,
-  ...GiIcons,
-  ...GrIcons,
-  ...RiIcons,
-  ...SiIcons,
-  ...TbIcons,
-  ...TiIcons,
-  ...LuIcons,
-};
+import { FiHelpCircle } from "react-icons/fi";
 
 interface EasyIconProps {
-  icon: string; // Just pass the icon name like "FiStar" or "FaRocket"
+  icon: string;
   size?: number;
   color?: string;
   className?: string;
@@ -49,14 +14,74 @@ const EasyIcon: React.FC<EasyIconProps> = ({
   color,
   className = "",
 }) => {
-  // Find the icon component
-  const IconComponent = ALL_ICONS[icon as keyof typeof ALL_ICONS] as any;
+  const [IconComponent, setIconComponent] = React.useState<any>(null);
 
-  if (!IconComponent || typeof IconComponent !== 'function') {
-    console.warn(`Icon "${icon}" not found. Using fallback.`);
-    return (
-      <FiIcons.FiHelpCircle size={size} color={color} className={className} />
-    );
+  React.useEffect(() => {
+    const prefix = icon.substring(0, 2);
+    let importPromise;
+
+    switch (prefix) {
+      case "Fi":
+        importPromise = import("react-icons/fi");
+        break;
+      case "Fa":
+        importPromise = import("react-icons/fa");
+        break;
+      case "Md":
+        importPromise = import("react-icons/md");
+        break;
+      case "Hi":
+        importPromise = import("react-icons/hi");
+        break;
+      case "Io":
+        importPromise = import("react-icons/io5");
+        break;
+      case "Ai":
+        importPromise = import("react-icons/ai");
+        break;
+      case "Bi":
+        importPromise = import("react-icons/bi");
+        break;
+      case "Bs":
+        importPromise = import("react-icons/bs");
+        break;
+      case "Cg":
+        importPromise = import("react-icons/cg");
+        break;
+      case "Gi":
+        importPromise = import("react-icons/gi");
+        break;
+      case "Gr":
+        importPromise = import("react-icons/gr");
+        break;
+      case "Ri":
+        importPromise = import("react-icons/ri");
+        break;
+      case "Si":
+        importPromise = import("react-icons/si");
+        break;
+      case "Tb":
+        importPromise = import("react-icons/tb");
+        break;
+      case "Ti":
+        importPromise = import("react-icons/ti");
+        break;
+      default:
+        importPromise = import("lucide-react");
+    }
+
+    importPromise
+      .then((module) => {
+        const Component = module[icon];
+        if (Component) {
+          setIconComponent(() => Component);
+        }
+      })
+      .catch(() => setIconComponent(null));
+  }, [icon]);
+
+  if (!IconComponent) {
+    return <FiHelpCircle size={size} color={color} className={className} />;
   }
 
   return <IconComponent size={size} color={color} className={className} />;

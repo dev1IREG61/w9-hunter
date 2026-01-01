@@ -1,9 +1,17 @@
-import { useState, useEffect } from "react";
-import LandingPage from "./pages/LandingPage";
-import { FeaturesPage } from "../src/components/features/features-page/FeaturesPage"; // Updated import
-import DebugFeaturesAPI from "./pages/DebugFeaturesApi";
-import DebugLandingAPI from "./pages/DebugLandingApi";
-import ApiDebugger from "./components/ApiDebugger";
+import { useState, useEffect, lazy, Suspense } from "react";
+
+const LandingPage = lazy(() => import("./pages/LandingPage"));
+const FeaturesPage = lazy(() => import("../src/components/features/features-page/FeaturesPage").then(m => ({ default: m.FeaturesPage })));
+const DebugFeaturesAPI = lazy(() => import("./pages/DebugFeaturesApi"));
+const DebugLandingAPI = lazy(() => import("./pages/DebugLandingApi"));
+const ApiDebugger = lazy(() => import("./components/ApiDebugger"));
+
+const Loader = () => (
+  <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
+    <div style={{ width: "50px", height: "50px", border: "5px solid #f3f3f3", borderTop: "5px solid #3B82F6", borderRadius: "50%", animation: "spin 1s linear infinite" }}></div>
+    <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); }}`}</style>
+  </div>
+);
 
 function App() {
   const [currentView, setCurrentView] = useState<{
@@ -68,24 +76,15 @@ function App() {
     };
   }, []);
 
-  // Render based on current view
-  if (currentView.type === "features") {
-    return <FeaturesPage slug={currentView.slug} />;
-  }
-
-  if (currentView.type === "debug-features") {
-    return <DebugFeaturesAPI />;
-  }
-
-  if (currentView.type === "debug-landing") {
-    return <DebugLandingAPI />;
-  }
-
-  if (currentView.type === "api-debug") {
-    return <ApiDebugger />;
-  }
-
-  return <LandingPage />;
+  return (
+    <Suspense fallback={<Loader />}>
+      {currentView.type === "features" && <FeaturesPage slug={currentView.slug} />}
+      {currentView.type === "debug-features" && <DebugFeaturesAPI />}
+      {currentView.type === "debug-landing" && <DebugLandingAPI />}
+      {currentView.type === "api-debug" && <ApiDebugger />}
+      {currentView.type === "landing" && <LandingPage />}
+    </Suspense>
+  );
 }
 
 export default App;
